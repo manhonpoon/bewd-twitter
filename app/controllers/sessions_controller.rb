@@ -1,7 +1,7 @@
 class SessionsController < ApplicationController
   def create
     @user = User.find_by(username: params[:user][:username])
-    if @user and BCrypt::Password.new(@user.password) == params[:user][:password]
+    if @user && (@user.password == params[:user][:password])
       session = @user.sessions.create
       cookies.permanent.signed[:twitter_session_token] = {
         value: session.token,
@@ -36,7 +36,7 @@ class SessionsController < ApplicationController
   def destroy
     token = cookies.permanent.signed[:twitter_session_token]
     session = Session.find_by(token: token)
-    if session and session.destroy
+    if session&.destroy
       render json: {
         success: true
       }

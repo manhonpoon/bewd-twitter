@@ -1,7 +1,7 @@
 class Session < ApplicationRecord
   validates :user_id, presence: true
   
-  belongs_to :user, foreign_key: :user-id
+  belongs_to :user, foreign_key: :user_id
 
   before_validation :generate_session_token
   private

@@ -1,6 +1,4 @@
-json.task do
-  json.id         @task.id
-  json.content    @task.content
-  json.completed  @task.completed
-  json.created_at @task.created_at
+json.tweet do
+  json.username   @tweet.user.username
+  json.message    @tweet.message
 end

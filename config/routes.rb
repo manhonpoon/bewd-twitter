@@ -6,12 +6,13 @@ Rails.application.routes.draw do
   post '/users' => 'users#create'
   # SESSIONS
   post '/sessions' => 'sessions#create'
-  get '/sessions' => 'sessions#authenticated'
+  get '/authenticated', to: 'sessions#authenticated'
   delete '/sessions' => 'sessions#destroy'
   # TWEETS
   post'/tweets' => 'tweets#create'
   delete '/tweets/:id' => 'tweets#destroy'
   get'/tweets' => 'tweets#index'
+  get '/users/:username/tweets', to: 'tweets#index_by_user'
   
   # Redirect all other paths to index page, which will be taken over by AngularJS
   get '*path' => 'homepage#index'

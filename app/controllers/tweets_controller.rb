@@ -1,23 +1,29 @@
 class TweetsController < ApplicationController
   def index
-    @tweets = tweet.all
+    @tweets = Tweet.all.order(created_at: :desc)
     render 'tweets/index' # can be omitted
   end
 
-  def index_by_current_user
-    token = cookies.signed[:todolist_session_token]
-    session = Session.find_by(token: token)
-
-    if session
-      @tweets = session.user.tweets
-      render 'tweets/index' # can be omitted
+  def index_by_user
+    user = User.find_by(username: params[:username])
+  
+    if user
+      @tweets = user.tweets.select(:id, :message).map do |tweet|
+        {
+          id: tweet.id,
+          username: user.username,
+          message: tweet.message
+        }
+      end
+  
+      render json: { tweets: @tweets }
     else
       render json: { tweets: [] }
     end
   end
 
   def create
-    token = cookies.signed[:todolist_session_token]
+    token = cookies.signed[:twitter_session_token]
     session = Session.find_by(token: token)
 
     if session
@@ -35,30 +41,25 @@ class TweetsController < ApplicationController
   end
 
   def destroy
-    @tweet = tweet.find_by(id: params[:id])
-
-    if @tweet&.destroy
-      render json: { success: true }
+    token = cookies.signed[:twitter_session_token]
+    session = Session.find_by(token: token)
+  
+    if session
+      @tweet = Tweet.find(params[:id])
+      if @tweet.destroy
+        render json: { success: true }
+      else
+        render json: { success: false }
+      end
     else
       render json: { success: false }
     end
   end
-
-  def mark_complete
-    @tweet = tweet.find_by(id: params[:id])
-
-    render 'tweets/update' if @tweet&.update(completed: true)
-  end
-
-  def mark_active
-    @tweet = tweet.find_by(id: params[:id])
-
-    render 'tweets/update' if @tweet&.update(completed: false)
-  end
+  
 
   private
 
   def tweet_params
-    params.require(:tweet).permit(:content)
+    params.require(:tweet).permit(:message)
   end
 end
